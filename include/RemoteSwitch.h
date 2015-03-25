@@ -21,6 +21,7 @@ extern "C"
 {
 	#include "gpio.h"
 }
+
 /**
 * RemoteSwitch provides a generic class for simulation of common RF remote controls, like the 'Klik aan Klik uit'-system 
 * (http://www.klikaanklikuit.nl/), used to remotely switch lights etc.
@@ -39,7 +40,8 @@ extern "C"
 * - I measured the period lengths with a scope.  Thus: they work for my remotes, but may fail for yours...
 *   A better way would be to calculate the 'target'-timings using the  datasheets and the resistor-values on the remotes. 
 */
-class RemoteSwitch {
+class RemoteSwitch 
+{
 	public:
 		/**
 		* Constructor.
@@ -102,7 +104,8 @@ class RemoteSwitch {
 * ActionSwitch simulatos a remote, as sold in the Dutch 'Action' stores. But there are many similar systems on the market.
 * If your remote has setting for 5 address bits, and can control 5 devices on or off, then you can try to use the ActionSwitch
 */
-class ActionSwitch: RemoteSwitch {
+class ActionSwitch: RemoteSwitch 
+{
 	public:
 		/**
 		* Constructor
@@ -136,7 +139,8 @@ class ActionSwitch: RemoteSwitch {
 * These remotes have 4 on, 4 off buttons and a switch to switch between device 1-4 and 5-8. No futher configuration
 * possible.
 */
-class BlokkerSwitch: RemoteSwitch {
+class BlokkerSwitch: RemoteSwitch 
+{
 	public:
 		/**
 		* Constructor
@@ -165,7 +169,8 @@ class BlokkerSwitch: RemoteSwitch {
 * KaKuSwitch simulates a KlikAanKlikUit-remote, but there are many clones.
 * If your transmitter has a address dial with the characters A till P, you can try this class.
 */
-class KaKuSwitch: RemoteSwitch {
+class KaKuSwitch: RemoteSwitch 
+{
 	public:
 		/**
 		* Constructor
@@ -210,7 +215,8 @@ class KaKuSwitch: RemoteSwitch {
 * ElroSwitch simulatos a remote, as sold in the Dutch 'Action' stores. But there are many similar systems on the market.
 * If your remote has setting for 5 address bits, and can control 5 devices on or off, then you can try to use the ElroSwitch
 */
-class ElroSwitch: RemoteSwitch {
+class ElroSwitch: RemoteSwitch 
+{
 	public:
 		/**
 		* Constructor

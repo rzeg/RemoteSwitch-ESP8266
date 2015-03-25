@@ -12,7 +12,8 @@
 * RemoteSwitch
 ************/
 
-RemoteSwitch::RemoteSwitch(unsigned short pin, unsigned int periodusec, unsigned short repeats) {
+RemoteSwitch::RemoteSwitch(unsigned short pin, unsigned int periodusec, unsigned short repeats) 
+{
 	_pin=pin;
 	_periodusec=periodusec;
 	_repeats=repeats;
@@ -37,7 +38,8 @@ unsigned long RemoteSwitch::encodeTelegram(unsigned short trits[]) {
 }
 
 
-void RemoteSwitch::sendTelegram(unsigned short trits[]) {
+void RemoteSwitch::sendTelegram(unsigned short trits[]) 
+{
 	sendTelegram(encodeTelegram(trits),_pin);	
 }
 
@@ -68,7 +70,8 @@ void delayMicroseconds_WP(unsigned int uSdelay)
 * r = repeats as 2log. Thus, if r = 3, then signal is sent 2^3=8 times
 * d = data
 */
-void RemoteSwitch::sendTelegram(unsigned long data, unsigned short pin) {
+void RemoteSwitch::sendTelegram(unsigned long data, unsigned short pin) 
+{
 	unsigned int periodusec = (unsigned long)data >> 23; 
 	unsigned short repeats = 5 << (((unsigned long)data >> 20) & 7); // 7 = B111
 	data = data & 0xfffff; //truncate to 20 bit
@@ -76,19 +79,22 @@ void RemoteSwitch::sendTelegram(unsigned long data, unsigned short pin) {
 	//Convert the base3-code to base4, to avoid lengthy calculations when transmitting.. Messes op timings.
 	unsigned long dataBase4 = 0;
 	
-	for (unsigned short i=0; i<12; i++) {
+	for (unsigned short i=0; i<12; i++) 
+	{
 		dataBase4<<=2;
 		dataBase4|=(data%3);
 		data/=3;
 	}
      
-	for (unsigned short int j=0;j<repeats;j++) {		
+	for (unsigned short int j=0;j<repeats;j++) 
+	{		
 		//Sent one telegram		
 		
 		//Use data-var as working var
 		data=dataBase4;
 	
-		for (unsigned short i=0; i<12; i++) {
+		for (unsigned short i=0; i<12; i++) 
+		{
 			switch (data & 3) { // 3 = B11
 				case 0:
 					GPIO_OUTPUT_SET(pin, 1);
@@ -133,7 +139,8 @@ void RemoteSwitch::sendTelegram(unsigned long data, unsigned short pin) {
 	}
 }
 
-bool RemoteSwitch::isSameCode(unsigned long encodedTelegram, unsigned long receivedData) {
+bool RemoteSwitch::isSameCode(unsigned long encodedTelegram, unsigned long receivedData) 
+{
 	return (receivedData==(encodedTelegram & 0xFFFFF)); //Compare the 20 LSB's
 }
 
@@ -141,21 +148,25 @@ bool RemoteSwitch::isSameCode(unsigned long encodedTelegram, unsigned long recei
 * ElroSwitch
 ************/
 
-ElroSwitch::ElroSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) {
+ElroSwitch::ElroSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) 
+{
 	//Call contructor
 }
 
 
-void ElroSwitch::sendSignal(unsigned short systemCode, char device, bool on) {
+void ElroSwitch::sendSignal(unsigned short systemCode, char device, bool on) 
+{
 	sendTelegram(getTelegram(systemCode,device,on), _pin);
 }
 
-unsigned long ElroSwitch::getTelegram(unsigned short systemCode, char device, bool on) {
+unsigned long ElroSwitch::getTelegram(unsigned short systemCode, char device, bool on) 
+{
 	unsigned short trits[15];
 
 	device-=65;
 
-	for (unsigned short i=0; i<5; i++) {
+	for (unsigned short i=0; i<5; i++) 
+	{
 		//bits 0-4 contain address (2^5=32 addresses)
 		trits[i]=(systemCode & 1)?0:2;
 		systemCode>>=1;
@@ -180,21 +191,25 @@ unsigned long ElroSwitch::getTelegram(unsigned short systemCode, char device, bo
 * ActionSwitch
 ************/
 
-ActionSwitch::ActionSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) {
+ActionSwitch::ActionSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) 
+{
 	//Call contructor
 }
 
 
-void ActionSwitch::sendSignal(unsigned short systemCode, char device, bool on) {		
+void ActionSwitch::sendSignal(unsigned short systemCode, char device, bool on) 
+{		
 	sendTelegram(getTelegram(systemCode,device,on), _pin);
 }
 
-unsigned long ActionSwitch::getTelegram(unsigned short systemCode, char device, bool on) {
+unsigned long ActionSwitch::getTelegram(unsigned short systemCode, char device, bool on) 
+{
 	unsigned short trits[12];
 	
 	device-=65;
 	
-	for (unsigned short i=0; i<5; i++) {
+	for (unsigned short i=0; i<5; i++) 
+	{
 		//bits 0-4 contain address (2^5=32 addresses)
 		trits[i]=(systemCode & 1)?1:2;          
 		systemCode>>=1;
@@ -214,21 +229,25 @@ unsigned long ActionSwitch::getTelegram(unsigned short systemCode, char device, 
 * BlokkerSwitch
 ************/
 
-BlokkerSwitch::BlokkerSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) {
+BlokkerSwitch::BlokkerSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) 
+{
 	//Call contructor
 }
 
 
-void BlokkerSwitch::sendSignal(unsigned short device, bool on) {
+void BlokkerSwitch::sendSignal(unsigned short device, bool on) 
+{
 	sendTelegram(getTelegram(device,on), _pin);
 }
 
-unsigned long BlokkerSwitch::getTelegram(unsigned short device, bool on) {
+unsigned long BlokkerSwitch::getTelegram(unsigned short device, bool on) 
+{
 	unsigned short trits[12]={0};
 	
 	device--;
 	
-	for (unsigned short i=1; i<4; i++) {
+	for (unsigned short i=1; i<4; i++) 
+	{
 		//Bits 1-3 contain device 
 		trits[i]=(device & 1)?0:1;          
 		device>>=1;
@@ -244,21 +263,25 @@ unsigned long BlokkerSwitch::getTelegram(unsigned short device, bool on) {
 * KaKuSwitch
 ************/
 
-KaKuSwitch::KaKuSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) {
+KaKuSwitch::KaKuSwitch(unsigned short pin, unsigned int periodusec) : RemoteSwitch(pin,periodusec,3) 
+{
 	//Call contructor
 }
 
-void KaKuSwitch::sendSignal(char address, unsigned short device, bool on) {
+void KaKuSwitch::sendSignal(char address, unsigned short device, bool on) 
+{
 	sendTelegram(getTelegram(address, device, on), _pin);
 }
 
-unsigned long KaKuSwitch::getTelegram(char address, unsigned short device, bool on) {
+unsigned long KaKuSwitch::getTelegram(char address, unsigned short device, bool on) 
+{
 	unsigned short trits[12];
 	
 	address-=65;
 	device-=1;
 	
-	for (unsigned short i=0; i<4; i++) {
+	for (unsigned short i=0; i<4; i++) 
+	{
 		//bits 0-3 contain address (2^4 = 16 addresses)
 		trits[i]=(address & 1)?2:0;          
 		address>>=1;
@@ -279,11 +302,13 @@ unsigned long KaKuSwitch::getTelegram(char address, unsigned short device, bool 
 	return encodeTelegram(trits);
 }
 
-void KaKuSwitch::sendSignal(char address, unsigned short group, unsigned short device, bool on) {
+void KaKuSwitch::sendSignal(char address, unsigned short group, unsigned short device, bool on) 
+{
 	sendTelegram(getTelegram(address, group, on), _pin);
 }
 
-unsigned long KaKuSwitch::getTelegram(char address, unsigned short group, unsigned short device, bool on) {
+unsigned long KaKuSwitch::getTelegram(char address, unsigned short group, unsigned short device, bool on) 
+{
 	unsigned short trits[12], i;
 	
 	address-=65;
@@ -291,20 +316,23 @@ unsigned long KaKuSwitch::getTelegram(char address, unsigned short group, unsign
 	device-=1;
 	
 	//address. M3E Pin A0-A3
-	for (i=0; i<4; i++) {
+	for (i=0; i<4; i++) 
+	{
 		//bits 0-3 contain address (2^4 = 16 addresses)
 		trits[i]=(address & 1)?2:0;          
 		address>>=1;		
     }
 		
 	//device. M3E Pin A4-A5
-	for (; i<6; i++) {
+	for (; i<6; i++) 
+	{
 		trits[i]=(device & 1)?2:0;          
 		device>>=1;
 	}
 	
 	//group. M3E Pin A6-A7
-	for (; i<8; i++) {
+	for (; i<8; i++) 
+	{
 		trits[i]=(group & 1)?2:0;          
 		group>>=1;
 	}
